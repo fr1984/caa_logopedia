@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 class StorageService {
   static const String categoriesKey = 'categories';
   static const String symbolsKey = 'symbols';
+  static const String settingsKey = 'settings';
   final _uuid = const Uuid();
 
   Future<void> saveCategories(List<Category> categories) async {
@@ -61,5 +62,23 @@ class StorageService {
 
   String generateId() {
     return _uuid.v4();
+  }
+
+  Future<void> saveSettings(Map<String, dynamic> settings) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(settingsKey, json.encode(settings));
+  }
+
+  Future<Map<String, dynamic>> loadSettings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonString = prefs.getString(settingsKey);
+      if (jsonString != null) {
+        return json.decode(jsonString);
+      }
+    } catch (e) {
+      print('Errore caricamento impostazioni: $e');
+    }
+    return {};
   }
 }
